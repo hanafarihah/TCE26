@@ -96,7 +96,7 @@ def plot_cities():
     st.pyplot(fig)
     plt.close(fig)
     
-st.title("Week 5: Travelling Salesman Problem")
+st.title("Travelling Salesman Problem")
 st.subheader("Malaysian Cities Visualization")    
 plot_cities()
 
