@@ -94,7 +94,10 @@ def plot_cities():
     ax.grid(False)
     plt.tight_layout()
     st.pyplot(fig)
+    plt.close(fig)
     
+st.title("Week 5: Travelling Salesman Problem")
+st.subheader("Malaysian Cities Visualization")    
 plot_cities()
 
 #population
@@ -336,3 +339,4 @@ for i, txt in enumerate(shortest_path):
 fig.set_size_inches(16, 12)
 # plt.grid(color='k', linestyle='dotted')
 st.pyplot(fig)
+plt.close(fig)
