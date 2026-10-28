@@ -131,38 +131,41 @@ def total_dist_individual(individual):
 
 #fitness probablity function
 
+
 def fitness_prob(population):
     """
-    Calculating the fitness probability
-    Input:
-    1- Population
-    Output:
-    Population fitness probability
+    Calculate fitness probabilities for roulette-wheel selection.
+    Shorter routes have higher fitness.
     """
-    total_dist_all_individuals = []
-    for i in range(0, len(population)):
-        total_dist_all_individuals.append(total_dist_individual(population[i]))
+    total_dist_all_individuals = np.array([
+        total_dist_individual(individual)
+        for individual in population
+    ])
 
     max_population_cost = max(total_dist_all_individuals)
-    population_fitness = max_population_cost - total_dist_all_individuals
+
+    population_fitness = (
+        max_population_cost - total_dist_all_individuals
+    )
+
     population_fitness_sum = sum(population_fitness)
-    population_fitness_probs = population_fitness / population_fitness_sum
-    return population_fitness_probs
+
+    if population_fitness_sum == 0:
+        return np.ones(len(population)) / len(population)
+
+    return population_fitness / population_fitness_sum
 
 #roulette wheel
 
 def roulette_wheel(population, fitness_probs):
     """
-    Implement selection strategy based on roulette wheel proportionate selection.
-    Input:
-    1- population
-    2- fitness probabilities
-    Output:
-    selected individual
+    Select one individual using roulette-wheel selection.
     """
-    population_fitness_probs_cumsum = fitness_probs.cumsum()
-    bool_prob_array = population_fitness_probs_cumsum < np.random.uniform(0,1,1)
-    selected_individual_index = len(bool_prob_array[bool_prob_array == True]) - 1
+    selected_individual_index = np.random.choice(
+        len(population),
+        p=fitness_probs
+    )
+
     return population[selected_individual_index]
 
 #crossover
@@ -300,7 +303,6 @@ for i in range(0, n_population):
     total_dist_all_individuals.append(total_dist_individual(best_mixed_offspring[i]))
 index_minimum = np.argmin(total_dist_all_individuals)
 minimum_distance = min(total_dist_all_individuals)
-minimum_distance
 #shortest path
 # shortest_path = offspring_list[index_minimum]
 shortest_path = best_mixed_offspring[index_minimum]
