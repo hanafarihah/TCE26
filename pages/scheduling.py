@@ -12,6 +12,75 @@ st.set_page_config(
     layout="wide"
 )
 
+st.markdown("""
+<style>
+.stApp {
+    background-color: #F5F5F7;
+    color: #1D1D1F;
+}
+
+.block-container {
+    max-width: 1150px;
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+}
+
+h1, h2, h3 {
+    color: #1D1D1F;
+    letter-spacing: -0.025em;
+}
+
+div[data-testid="stMetric"] {
+    background: #FFFFFF;
+    border: 1px solid #E8E8ED;
+    border-radius: 18px;
+    padding: 20px;
+}
+
+div[data-testid="stMetricValue"] {
+    font-weight: 650;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"] > div {
+    border-radius: 18px;
+}
+
+div[data-testid="stDataFrame"] {
+    border: 1px solid #E8E8ED;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+div[data-testid="stExpander"] {
+    background: #FFFFFF;
+    border: 1px solid #E8E8ED;
+    border-radius: 14px;
+}
+
+.stButton > button[kind="primary"] {
+    background: #1D1D1F;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 12px;
+    padding: 0.65rem 1.5rem;
+    font-weight: 600;
+}
+
+.stButton > button[kind="primary"]:hover {
+    background: #3A3A3C;
+    color: #FFFFFF;
+}
+
+.stNumberInput input {
+    border-radius: 10px;
+}
+
+div[data-testid="stCaptionContainer"] {
+    color: #6E6E73;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # Program ratings for each time slot
 program_ratings_dict = {
     "news": [0.1, 0.7, 0.8, 0.3, 0.5, 0.4, 0.3, 0.2, 0.1, 0.2, 0.3, 0.7, 0.8, 0.4, 0.3, 0.2, 0.1, 0.2],
@@ -165,13 +234,58 @@ def run_trial(initial_schedule, crossover_rate, mutation_rate):
 
     return round(total_fitness, 2), schedule_table
 
+# Results recorded from Google Colab
+colab_experiments = pd.DataFrame([
+    {
+        "Experiment": 1,
+        "CO_R": 0.80,
+        "MUT_R": 0.20,
+        "Total Fitness": 7.80
+    },
+    {
+        "Experiment": 2,
+        "CO_R": 0.60,
+        "MUT_R": 0.03,
+        "Total Fitness": 8.00
+    },
+    {
+        "Experiment": 3,
+        "CO_R": 0.95,
+        "MUT_R": 0.05,
+        "Total Fitness": 8.60
+    }
+])
 
 # Page layout
-st.title("TV Scheduling Algorithm")
-st.caption("Genetic Algorithm")
+st.title("TV Scheduling")
+st.caption("Genetic Algorithm | Program Scheduling")
 st.divider()
 
-st.subheader("1. Algorithm Parameters")
+# Recorded experiment results
+st.subheader("Recorded Experiments")
+st.caption("Results obtained from Google Colab using modified program ratings.")
+
+col1, col2, col3 = st.columns(3)
+
+col1.metric("Experiments", "3")
+col2.metric("Highest Fitness", "8.60")
+col3.metric("Time Slots", "18")
+
+st.dataframe(
+    colab_experiments,
+    hide_index=True,
+    use_container_width=True
+)
+
+st.caption(
+    "These are previously recorded results. "
+    "New runs may produce different fitness scores."
+)
+
+st.divider()
+
+# Algorithm parameters
+st.subheader("Algorithm Parameters")
 
 col1, col2 = st.columns(2)
 
@@ -195,14 +309,12 @@ with col2:
         format="%.2f"
     )
 
-st.caption("Generations: 100 | Population: 50 | Elitism: 2")
+st.caption("100 Generations  ·  50 Population  ·  2 Elitism")
 
 if "scheduling_trials" not in st.session_state:
     st.session_state.scheduling_trials = []
 
-
 if st.button("Run Genetic Algorithm", type="primary"):
-
     with st.spinner("Generating TV schedule..."):
         initial_schedule = find_initial_schedule()
 
@@ -220,26 +332,16 @@ if st.button("Run Genetic Algorithm", type="primary"):
         "Schedule": schedule_table
     })
 
-
-# Display scheduling results
+# Results from the current session
 if st.session_state.scheduling_trials:
-
     latest = st.session_state.scheduling_trials[-1]
 
     st.divider()
-    st.subheader("2. Final TV Schedule")
+    st.subheader("Generated TV Schedule")
 
     col1, col2 = st.columns(2)
-
-    col1.metric(
-        "Total Fitness",
-        f"{latest['Total Fitness']:.2f}"
-    )
-
-    col2.metric(
-        "Time Slots",
-        len(latest["Schedule"])
-    )
+    col1.metric("Total Fitness", f"{latest['Total Fitness']:.2f}")
+    col2.metric("Time Slots", len(latest["Schedule"]))
 
     st.dataframe(
         latest["Schedule"],
@@ -249,7 +351,7 @@ if st.session_state.scheduling_trials:
     )
 
     st.divider()
-    st.subheader("3. Experiment History")
+    st.subheader("Current Session History")
 
     results_table = pd.DataFrame([
         {
@@ -268,7 +370,6 @@ if st.session_state.scheduling_trials:
     )
 
     for item in st.session_state.scheduling_trials:
-
         with st.expander(
             f"Trial {item['Trial']} | "
             f"CO_R: {item['CO_R']:.2f} | "
@@ -282,12 +383,12 @@ if st.session_state.scheduling_trials:
                 height=680
             )
 
-    if st.button("Clear Trial History"):
+    if st.button("Clear Session History"):
         st.session_state.scheduling_trials = []
         st.rerun()
 
 else:
     st.info(
-        "Set the parameters and click Run Genetic Algorithm "
-        "to generate a TV schedule."
+        "Adjust the parameters and run the algorithm "
+        "to generate a new TV schedule."
     )
