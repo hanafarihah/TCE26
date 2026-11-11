@@ -234,6 +234,7 @@ def run_trial(initial_schedule, crossover_rate, mutation_rate):
 
     return round(total_fitness, 2), schedule_table
 
+
 # Results recorded from Google Colab
 colab_experiments = pd.DataFrame([
     {
@@ -253,6 +254,12 @@ colab_experiments = pd.DataFrame([
         "CO_R": 0.95,
         "MUT_R": 0.05,
         "Total Fitness": 8.60
+    },
+    {
+        "Experiment": 4,
+        "CO_R": 0.40,
+        "MUT_R": 0.04,
+        "Total Fitness": 8.00
     }
 ])
 
@@ -267,7 +274,7 @@ st.caption("Results obtained from Google Colab using modified program ratings.")
 
 col1, col2, col3 = st.columns(3)
 
-col1.metric("Experiments", "3")
+col1.metric("Experiments", str(len(colab_experiments)))
 col2.metric("Highest Fitness", "8.60")
 col3.metric("Time Slots", "18")
 
@@ -299,12 +306,13 @@ with col1:
         format="%.2f"
     )
 
+
 with col2:
     MUT_R = st.number_input(
         "Mutation Rate (MUT_R)",
         min_value=0.01,
-        max_value=0.20,
-        value=0.20,
+        max_value=0.05,
+        value=0.03,
         step=0.01,
         format="%.2f"
     )
